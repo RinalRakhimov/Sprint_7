@@ -8,6 +8,7 @@ import org.junit.runners.Parameterized;
 import java.util.ArrayList;
 import java.util.List;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.apache.http.HttpStatus.*;
 
 @RunWith(Parameterized.class)
 public class OrderCreationTest {
@@ -63,7 +64,7 @@ public class OrderCreationTest {
     @Description("Orders creation with different colors")
     public void orderCreateColorsTest() {
         Response orderResponse = OrderSteps.getPostRequestForOrderCreation(new Order(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color));
-        orderResponse.then().assertThat().statusCode(201)
+        orderResponse.then().assertThat().statusCode(SC_CREATED)
                 .and()
                 .body("track", notNullValue());
     }

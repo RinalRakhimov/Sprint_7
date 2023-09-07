@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.apache.http.HttpStatus.*;
 
 public class CourierLoginTest {
     @Before
@@ -13,12 +14,13 @@ public class CourierLoginTest {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
         CourierSteps.sendPostRequestCourierCreation(new Courier("tuchk27", "1122", "charlie"));
     }
+
     @Test
     @Description ("Checking status code and body on log in /api/v1/courier/login")
     public void getLoginCourierStatusCodeAndBody() {
         Response loginResponse = CourierSteps.sendPostRequestCourierLogin(new Courier("tuchk27", "1122"));
         loginResponse.then().assertThat()
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .and()
                 .body("id", notNullValue());
     }
@@ -27,7 +29,7 @@ public class CourierLoginTest {
     public void getLoginCourierStatusCodeAndBodyWithoutLoginParameter() {
         Response loginResponse = CourierSteps.sendPostRequestCourierLogin(new Courier("", "1122"));
         loginResponse.then().assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
@@ -36,7 +38,7 @@ public class CourierLoginTest {
     public void getLoginCourierStatusCodeAndBodyWithoutPasswordParameter() {
         Response loginResponse = CourierSteps.sendPostRequestCourierLogin(new Courier("tuchk27", ""));
         loginResponse.then().assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для входа"));
     }
@@ -45,7 +47,7 @@ public class CourierLoginTest {
     public void getLoginCourierStatusCodeAndBodyWithNotExistingParameters() {
         Response loginResponse = CourierSteps.sendPostRequestCourierLogin(new Courier("tuchka100", "2288"));
         loginResponse.then().assertThat()
-                .statusCode(404)
+                .statusCode(SC_NOT_FOUND)
                 .and()
                 .body("message", equalTo("Учетная запись не найдена"));
     }

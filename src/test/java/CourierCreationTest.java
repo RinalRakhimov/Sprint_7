@@ -6,9 +6,9 @@ import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.Before;
 import static org.hamcrest.Matchers.*;
+import static org.apache.http.HttpStatus.*;
 
 public class CourierCreationTest {
-
     @Before
     public void setUp() {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
@@ -17,9 +17,9 @@ public class CourierCreationTest {
     @DisplayName("Check status code and body of /api/v1/courier") // имя теста
     @Description ("Basic test for /api/v1/courier endpoint")
     public void getNewCourierSuccessCreationStatusCodeAndBody(){
-        Response responseNewCourierCreation = CourierSteps.sendPostRequestCourierCreation(new Courier("tuchka26", "1122", "charlie"));
+        Response responseNewCourierCreation = CourierSteps.sendPostRequestCourierCreation(new Courier("tuchka35", "1122", "charlie"));
         responseNewCourierCreation.then().assertThat()
-                        .statusCode(201)
+                        .statusCode(SC_CREATED)
                         .and()
                         .body("ok", equalTo(true));
     }
@@ -27,9 +27,9 @@ public class CourierCreationTest {
     @DisplayName("Check status code and body of /api/v1/courier with using dublicate login") // имя теста
     @Description ("Try to create new courier with existing login")
     public void createNewCourierWithExistingLogin(){
-        Response responseNewCourierWithExistingLogin = CourierSteps.sendPostRequestCourierCreation(new Courier("tuchka26", "1122", "charlie"));
+        Response responseNewCourierWithExistingLogin = CourierSteps.sendPostRequestCourierCreation(new Courier("tuchka35", "1122", "charlie"));
         responseNewCourierWithExistingLogin.then().assertThat()
-                .statusCode(409)
+                .statusCode(SC_CONFLICT)
                 .and()
                 .body("message", equalTo("Этот логин уже используется. Попробуйте другой."));
     }
@@ -38,9 +38,9 @@ public class CourierCreationTest {
     @DisplayName("Create new courier without login") // имя теста
     @Description ("Try to create new courier without \"login\" parameter")
     public void createNewCourierWithoutLogin(){
-        Response responseNewCourierWithoutLogin = CourierSteps.sendPostRequestCourierCreation(new Courier("", "1122", "charlie"));
+        Response responseNewCourierWithoutLogin = CourierSteps.sendPostRequestCourierCreation(new Courier("", "2211", "charlie"));
         responseNewCourierWithoutLogin.then().assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для создания учетной записи"));
     }
@@ -48,16 +48,14 @@ public class CourierCreationTest {
     @DisplayName("Create new courier without password") // имя теста
     @Description ("Try to create new courier without \"password\" parameter")
     public void createNewCourierWithoutPassword(){
-        Courier courier = new Courier("enot", "", "charlie");
         Response responseNewCourierWithoutPassword = CourierSteps.sendPostRequestCourierCreation(new Courier("tuchka26", "", "charlie"));
         responseNewCourierWithoutPassword.then().assertThat()
-                .statusCode(400)
+                .statusCode(SC_BAD_REQUEST)
                 .and()
                 .body("message", equalTo("Недостаточно данных для создания учетной записи"));
     }
     @AfterClass
     public static void dataClear() {
-
-        CourierSteps.deleteCourier(new Courier("tuchka26", "1122"));
+        CourierSteps.deleteCourier(new Courier("tuchka35", "1122"));
     }
 }
